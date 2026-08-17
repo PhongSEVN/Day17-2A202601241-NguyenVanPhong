@@ -29,9 +29,14 @@
 --   rõ hai vấn đề này tách nhau.
 -- ---------------------------------------------------------------------------
 
+-- Giải thích nguyên nhân sửa (Nhiệm vụ 2):
+-- 1. Khóa unique_key cần mảng 2 cột ['event_date', 'customer_id'] vì grain của bảng là tổ hợp 2 trường này.
+-- 2. Dùng incremental_strategy='merge' để tránh lặp dữ liệu cộng dồn khi quét lại các ngày cũ.
 {{ config(
-    materialized     = 'incremental',
-    on_schema_change = 'fail'
+    materialized         = 'incremental',
+    unique_key           = ['event_date', 'customer_id'],
+    incremental_strategy = 'merge',
+    on_schema_change     = 'fail'
 ) }}
 
 select
@@ -49,7 +54,9 @@ select
 from {{ ref('silver_events') }}
 
 {% if is_incremental() %}
-where event_date > (select max(event_date) from {{ this }})
+-- Giải thích nguyên nhân sửa (Nhiệm vụ 2):
+-- Đổi toán tử thành '>=' và lùi lại 3 ngày (- interval 3 day) để quét vét lại các dữ liệu đến muộn (Late-arriving data) dựa theo P99.
+where event_date >= (select max(event_date) from {{ this }}) - interval 3 day
 {% endif %}
 
 group by 1, 2, 3, 4

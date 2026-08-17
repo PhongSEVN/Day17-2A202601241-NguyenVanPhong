@@ -33,8 +33,11 @@ with DAG(
     # TODO (nhiệm vụ 1): hai tham số dưới đây quyết định chuyện gì xảy ra
     # khi ai đó bấm Clear Task, và khi DAG bị dồn nhiều lần chạy cùng lúc.
     # Đọc lại triệu chứng ở phiếu #1041 rồi đặt lại cho đúng.
-    catchup=True,
-    # max_active_runs=?
+    # Giải thích nguyên nhân sửa:
+    # 1. catchup=False: Ngăn Airflow tự động chạy bù ồ ạt các ngày trong quá khứ khi bấm Clear Task.
+    # 2. max_active_runs=1: Giới hạn chỉ cho chạy 1 luồng tại một thời điểm để tránh Race Condition (xung đột ghi đè dữ liệu).
+    catchup=False,
+    max_active_runs=1,
     # ------------------------------------------------------------------
 ) as dag:
 

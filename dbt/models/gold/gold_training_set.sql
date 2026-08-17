@@ -24,9 +24,14 @@
 --   backfill một ngày không phải quét lại toàn bộ lịch sử. Giữ nguyên nó.
 -- ---------------------------------------------------------------------------
 
+-- Giải thích nguyên nhân sửa (Nhiệm vụ 1):
+-- 1. Thêm unique_key='ticket_id' để xác định tính duy nhất của mỗi dòng ticket.
+-- 2. Dùng incremental_strategy='merge' để dbt Ghi đè (Update) dữ liệu cũ thành mới thay vì Chèn thêm (Append) gây lặp dữ liệu.
 {{ config(
-    materialized     = 'incremental',
-    on_schema_change = 'fail'
+    materialized         = 'incremental',
+    unique_key           = 'ticket_id',
+    incremental_strategy = 'merge',
+    on_schema_change     = 'fail'
 ) }}
 
 select

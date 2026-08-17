@@ -6,11 +6,11 @@ Tài liệu này không cho lời giải. Nó cho bạn **trình tự thao tác*
 Khung pseudo-code của từng nhiệm vụ nằm ngay trong file cần sửa, dưới dạng
 comment `KHUNG THỰC HIỆN`:
 
-| Nhiệm vụ | File chứa khung pseudo-code |
-|---|---|
-| 1 | `dbt/models/gold/gold_training_set.sql` |
-| 2 | `dbt/models/gold/gold_feature_daily.sql` |
-| 3 | `dbt/macros/normalize_priority.sql`, `dbt/models/silver/silver_tickets.sql`, `dbt/models/silver/quarantine_tickets.sql` |
+| Nhiệm vụ | File chứa khung pseudo-code                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 1          | `dbt/models/gold/gold_training_set.sql`                                                                                     |
+| 2          | `dbt/models/gold/gold_feature_daily.sql`                                                                                    |
+| 3          | `dbt/macros/normalize_priority.sql`, `dbt/models/silver/silver_tickets.sql`, `dbt/models/silver/quarantine_tickets.sql` |
 
 Hai bài mở rộng (không bắt buộc) nằm trong [EXTRA.md](EXTRA.md).
 
@@ -55,15 +55,15 @@ q "select count(*) from gold_training_set"
 
 ### Các bảng sẽ dùng
 
-| Bảng | Nội dung |
-|---|---|
-| `bronze_tickets_cdc` | CDC thô, `priority_raw` kiểu VARCHAR |
-| `bronze_events` | Event thô, có `event_time` và `_ingested_at` |
-| `silver_tickets` | Trạng thái mới nhất của mỗi ticket |
-| `silver_events` | Event đã dedup, có `event_date` |
-| `gold_training_set` | 1 row / 1 ticket |
-| `gold_feature_daily` | 1 row / (ngày, customer) |
-| `gold_doc_chunks` | 1 row / 1 chunk — **nhóm đối chứng**, không có lỗi |
+| Bảng                  | Nội dung                                                       |
+| ---------------------- | --------------------------------------------------------------- |
+| `bronze_tickets_cdc` | CDC thô,`priority_raw` kiểu VARCHAR                         |
+| `bronze_events`      | Event thô, có`event_time` và `_ingested_at`              |
+| `silver_tickets`     | Trạng thái mới nhất của mỗi ticket                        |
+| `silver_events`      | Event đã dedup, có`event_date`                             |
+| `gold_training_set`  | 1 row / 1 ticket                                                |
+| `gold_feature_daily` | 1 row / (ngày, customer)                                       |
+| `gold_doc_chunks`    | 1 row / 1 chunk —**nhóm đối chứng**, không có lỗi |
 
 ---
 
@@ -341,11 +341,11 @@ group by 1 order by 1;
 
 `priority_raw` có ba nhóm, và ba nhóm này phải xử lý khác nhau:
 
-| Nhóm | Ví dụ | Bản chất | Xử lý |
-|---|---|---|---|
-| Số hợp lệ | `1` `2` `3` `4` | Đúng contract ban đầu | Giữ nguyên |
-| Nhãn chuỗi | `urgent` `high` `medium` `low` | **Schema evolution**: source đổi cách biểu diễn, ý nghĩa không đổi | **Map** về 1..4 |
-| Giá trị không hợp lệ | `P1` `unknown` `0` `5` `-1` `''` `null` | Dữ liệu lỗi thật | Đưa vào **quarantine** |
+| Nhóm                     | Ví dụ                                               | Bản chất                                                                         | Xử lý                        |
+| ------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------ |
+| Số hợp lệ              | `1` `2` `3` `4`                               | Đúng contract ban đầu                                                          | Giữ nguyên                   |
+| Nhãn chuỗi              | `urgent` `high` `medium` `low`                | **Schema evolution**: source đổi cách biểu diễn, ý nghĩa không đổi | **Map** về 1..4         |
+| Giá trị không hợp lệ | `P1` `unknown` `0` `5` `-1` `''` `null` | Dữ liệu lỗi thật                                                               | Đưa vào**quarantine** |
 
 Tiêu chí phân biệt nhóm 2 và nhóm 3: *giá trị này có mang đúng thông tin của
 contract cũ, chỉ khác cách biểu diễn hay không?* Có thì map, không thì quarantine.
@@ -433,12 +433,12 @@ sẽ ghi thêm thay vì ghi đè.*
 
 ## Phụ lục A — Xử lý sự cố thường gặp
 
-| Hiện tượng | Hướng xử lý |
-|---|---|
-| `Can't open a connection to same database file` | Có tiến trình khác đang mở `warehouse.duckdb`; đóng shell DuckDB đang chạy |
-| `make verify` lỗi lạ sau nhiều lần sửa | `make clean && make pipeline` |
-| Không hiểu dbt sinh ra SQL gì | Đọc `dbt/target/run/lab17/models/.../<model>.sql` — xem mục 0b |
-| Số row đúng nhưng `ỔN ĐỊNH` ✗ | Model đang `insert` thay vì `merge` / `delete+insert` |
-| `ỔN ĐỊNH` ✓ nhưng thiếu row | Điều kiện lọc bỏ sót dữ liệu — xem nhiệm vụ 2 |
-| `quarantine_tickets` có hàng nghìn row | Đang quarantine cả nhãn chuỗi hợp lệ — xem mục 3.2 |
-| `silver_tickets` dưới 12.480 row | Đang loại cả ticket thay vì chỉ loại row CDC lỗi — xem mục 3.3(a) |
+| Hiện tượng                                     | Hướng xử lý                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `Can't open a connection to same database file` | Có tiến trình khác đang mở`warehouse.duckdb`; đóng shell DuckDB đang chạy |
+| `make verify` lỗi lạ sau nhiều lần sửa     | `make clean && make pipeline`                                                       |
+| Không hiểu dbt sinh ra SQL gì                  | Đọc`dbt/target/run/lab17/models/.../<model>.sql` — xem mục 0b                   |
+| Số row đúng nhưng`ỔN ĐỊNH` ✗            | Model đang`insert` thay vì `merge` / `delete+insert`                          |
+| `ỔN ĐỊNH` ✓ nhưng thiếu row               | Điều kiện lọc bỏ sót dữ liệu — xem nhiệm vụ 2                              |
+| `quarantine_tickets` có hàng nghìn row       | Đang quarantine cả nhãn chuỗi hợp lệ — xem mục 3.2                            |
+| `silver_tickets` dưới 12.480 row              | Đang loại cả ticket thay vì chỉ loại row CDC lỗi — xem mục 3.3(a)            |
